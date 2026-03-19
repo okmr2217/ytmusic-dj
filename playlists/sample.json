@@ -1,0 +1,30 @@
+{
+  "playlist_name": "サンプル - 作業用BGM",
+  "description": "ytmusic-dj のサンプルプレイリスト",
+  "tracks": [
+    {
+      "title": "Wonderwall",
+      "artist": "Oasis",
+      "priority": "high",
+      "tags": ["rock"],
+      "mood": "chill",
+      "phase": "1_warmup"
+    },
+    {
+      "title": "Bohemian Rhapsody",
+      "artist": "Queen",
+      "priority": "high",
+      "tags": ["rock", "classic"],
+      "mood": "energy",
+      "phase": "2_main"
+    },
+    {
+      "title": "Shape of You",
+      "artist": "Ed Sheeran",
+      "priority": "medium",
+      "tags": ["pop"],
+      "mood": "energy",
+      "phase": "2_main"
+    }
+  ]
+}

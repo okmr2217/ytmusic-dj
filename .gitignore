@@ -1,0 +1,32 @@
+# 認証ファイル（絶対にコミットしない）
+browser.json
+oauth.json
+oauth_clean.json
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# 仮想環境
+venv/
+.venv/
+env/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# playlists
+playlists/*.json
+!playlists/sample.json

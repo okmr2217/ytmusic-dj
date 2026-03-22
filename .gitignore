@@ -30,3 +30,4 @@ Thumbs.db
 # playlists
 playlists/*.json
 !playlists/sample.json
+playlists/アディ/

@@ -28,6 +28,5 @@ env/
 Thumbs.db
 
 # playlists
-playlists/*.json
+playlists/**/*.json
 !playlists/sample.json
-playlists/アディ/

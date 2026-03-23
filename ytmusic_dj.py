@@ -3,6 +3,7 @@
 YouTube Music DJ — テキスト(JSON)からプレイリストを自動生成
 Usage:
     python ytmusic_dj.py playlist.json
+    python ytmusic_dj.py /path/to/dir/         # ディレクトリ内の全JSONを処理
     python ytmusic_dj.py playlist.json --phase 2_design
     python ytmusic_dj.py playlist.json --mood chill
     python ytmusic_dj.py playlist.json --tags 日本語ラップ
@@ -238,7 +239,7 @@ def main():
     parser = argparse.ArgumentParser(
         description="🎵 YouTube Music DJ — JSONからプレイリスト自動生成"
     )
-    parser.add_argument("json_file", help="プレイリストJSONファイルのパス")
+    parser.add_argument("json_file", help="プレイリストJSONファイルのパス、またはJSONが入ったディレクトリ")
     parser.add_argument("--phase", help="フェーズでフィルタ (例: 1_warmup, 2_design, 3_implement, 4_closing)")
     parser.add_argument("--mood", help="ムードでフィルタ (例: energy, chill, focus)")
     parser.add_argument("--tags", nargs="+", help="タグでフィルタ (例: 日本語ラップ 海外ラップ)")
@@ -247,14 +248,42 @@ def main():
 
     args = parser.parse_args()
 
-    create_playlist_from_json(
-        json_path=args.json_file,
-        phase=args.phase,
-        mood=args.mood,
-        tags=args.tags,
-        priority=args.priority,
-        dry_run=args.dry_run
-    )
+    target = Path(args.json_file)
+
+    # ディレクトリが指定された場合は全JSONを処理
+    if target.is_dir():
+        json_files = sorted(target.glob("*.json"))
+        if not json_files:
+            print(f"❌ JSONファイルが見つかりません: {target}")
+            sys.exit(1)
+        print(f"📂 ディレクトリ: {target}")
+        print(f"   {len(json_files)}件のJSONファイルを処理します\n")
+        for i, json_path in enumerate(json_files, 1):
+            print(f"{'='*60}")
+            print(f"[{i}/{len(json_files)}] {json_path.name}")
+            print(f"{'='*60}")
+            create_playlist_from_json(
+                json_path=str(json_path),
+                phase=args.phase,
+                mood=args.mood,
+                tags=args.tags,
+                priority=args.priority,
+                dry_run=args.dry_run
+            )
+            if i < len(json_files):
+                print(f"\n⏳ 次のファイルまで少し待機...\n")
+                time.sleep(2)
+        print(f"\n{'='*60}")
+        print(f"✨ 全{len(json_files)}件の処理が完了しました！")
+    else:
+        create_playlist_from_json(
+            json_path=args.json_file,
+            phase=args.phase,
+            mood=args.mood,
+            tags=args.tags,
+            priority=args.priority,
+            dry_run=args.dry_run
+        )
 
 
 if __name__ == "__main__":

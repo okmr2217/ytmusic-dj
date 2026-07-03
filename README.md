@@ -1,173 +1,71 @@
-# 🎵 YouTube Music DJ — セットアップ & 使い方
+# yt-playlist-import
 
-テキストベースのセットリストからYouTube Musicプレイリストを自動生成するPython CLIツール。フェーズ・ムード・ジャンル等のメタデータでフィルタリング可能。
+JSON設定ファイルからYouTubeプレイリストを一括作成するスクリプト。
+YouTube Music の視聴履歴(Google Takeout)などから選定した曲(videoId)を
+`playlists-config.json` にまとめておき、実行すると設定通りのプレイリストが作成される。
 
-## 1. インストール
+## 運用方針
 
-```powershell
-pip install ytmusicapi
-```
+- **作成専用**。同じ `title` のプレイリストがチャンネル内に既に存在する場合は
+  スキップする(既存プレイリストへの曲の追加・同期は行わない)
+- 既存判定は毎回 `playlists.list` でチャンネル内を検索して `title` を照合する
+  (状態ファイルなどは使わない。同名プレイリストが手動で存在する場合はスキップされる点に注意)
 
-## 2. 認証セットアップ（初回のみ）
+## セットアップ
 
-### 方法A: コマンドで対話セットアップ
+1. `npm install`
+2. Google Cloud Console で OAuthクライアントID(デスクトップアプリ)を発行し
+   YouTube Data API v3 を有効化
+3. 環境変数を設定:
+   ```
+   export YT_CLIENT_ID="xxxxx.apps.googleusercontent.com"
+   export YT_CLIENT_SECRET="xxxxx"
+   ```
+4. `playlists-config.example.json` を参考に `playlists-config.json` を作成
 
-```powershell
-cd ytmusic_dj
-ytmusicapi browser
-```
-
-対話形式で以下を聞かれる：
-
-1. **Chrome で music.youtube.com を開く**（ログイン済みであること）
-2. **F12** → **Network** タブ → **F5でリロード**
-3. リクエスト一覧から `music.youtube.com` 宛のリクエストを1つクリック
-4. **Request Headers** から以下をコピペ：
-   - `Cookie` ← 一番重要。とても長い文字列
-   - その他聞かれたヘッダー
-
-→ `browser.json` が生成される
-
-### 方法B: Pythonで対話セットアップ
-
-```python
-from ytmusicapi import YTMusic
-YTMusic.setup(filepath="browser.json")
-```
-
-同じく対話形式でヘッダーを聞かれる。
-
-### 認証の確認
-
-```python
-from ytmusicapi import YTMusic
-yt = YTMusic("browser.json")
-print(yt.get_library_playlists())  # 自分のプレイリスト一覧が表示されればOK
-```
-
----
-
-## 3. 使い方
-
-### 基本（全曲でプレイリスト作成）
-
-```powershell
-python ytmusic_dj.py playlist.json
-```
-
-### ドライラン（検索テストだけ、プレイリスト作成しない）
-
-```powershell
-python ytmusic_dj.py playlist.json --dry-run
-```
-
-**まずはドライランで正しい曲が見つかるか確認してから本番実行がおすすめ！**
-
-### フェーズ指定
-
-```powershell
-# ウォームアップ曲だけ
-python ytmusic_dj.py playlist.json --phase 1_warmup
-
-# 設計フェーズの曲だけ
-python ytmusic_dj.py playlist.json --phase 2_design
-
-# 実装フェーズの曲だけ
-python ytmusic_dj.py playlist.json --phase 3_implement
-
-# クロージングだけ
-python ytmusic_dj.py playlist.json --phase 4_closing
-```
-
-### ムード指定
-
-```powershell
-# エナジー系だけ
-python ytmusic_dj.py playlist.json --mood energy
-
-# チル系だけ
-python ytmusic_dj.py playlist.json --mood chill
-
-# 集中系だけ
-python ytmusic_dj.py playlist.json --mood focus
-```
-
-### タグ（ジャンル）指定
-
-```powershell
-# 日本語ラップだけ
-python ytmusic_dj.py playlist.json --tags 日本語ラップ
-
-# 海外ラップだけ
-python ytmusic_dj.py playlist.json --tags 海外ラップ
-
-# 複数タグ（OR条件）
-python ytmusic_dj.py playlist.json --tags 日本語ラップ 海外ラップ
-```
-
-### 優先度指定
-
-```powershell
-# ヘビロテだけの短めリスト
-python ytmusic_dj.py playlist.json --priority high
-```
-
-### フィルタ組み合わせ
-
-```powershell
-# 実装フェーズ × エナジー系
-python ytmusic_dj.py playlist.json --phase 3_implement --mood energy
-
-# 日本語ラップ × チル
-python ytmusic_dj.py playlist.json --tags 日本語ラップ --mood chill
-```
-
----
-
-## 4. JSONデータ形式
+## 設定ファイルの形式
 
 ```json
 {
-  "playlist_name": "プレイリスト名",
-  "description": "説明文",
-  "tracks": [
+  "playlists": [
     {
-      "title": "曲名",          // 必須
-      "artist": "アーティスト名",  // 必須
-      "priority": "high",       // high / medium / low
-      "tags": ["ジャンル"],      // フィルタ用
-      "mood": "energy",         // energy / chill / focus
-      "phase": "1_warmup",      // 作業フェーズ
-      "play_count": 15,         // 再生回数（参考情報）
-      "note": "メモ"            // 任意
+      "title": "Chill Night Drive",
+      "description": "夜のドライブ用に選定",
+      "privacyStatus": "private",
+      "tracks": [
+        { "videoId": "dQw4w9WgXcQ", "title": "曲名", "artist": "アーティスト名" },
+        { "videoId": "xxxxxxxxxxx" }
+      ]
     }
   ]
 }
 ```
 
-`title` と `artist` 以外は全てオプションです。
+- `description` / `privacyStatus` は省略可。`privacyStatus` のデフォルトは `private`
+- `tracks[].title` / `tracks[].artist` は省略可(ログ表示・失敗レポート用の任意項目)
+- `tracks` の配列順がそのままプレイリストへの追加順(再生順)になる
 
----
+## 実行
 
-## 5. トラブルシューティング
+```
+npx tsx create-playlists-from-config.ts ./playlists-config.json
+```
 
-### 認証エラーが出る
-- `browser.json` の Cookie が期限切れの可能性あり
-- → 再度 `ytmusicapi browser` でセットアップし直す
+初回はブラウザで認可画面が開く。認可後は `token.json` にリフレッシュトークンが
+保存されるので、2回目以降はブラウザ操作なしで実行できる。
 
-### 曲が見つからない
-- 日本語の曲名が YouTube Music に登録されている表記と違う場合がある
-- → playlist.json の曲名を YouTube Music の表記に合わせる
-- → `--dry-run` で検索結果を確認して調整
+## ログ
 
-### レート制限に引っかかる
-- `ytmusic_dj.py` 内の `REQUEST_DELAY` を大きくする（デフォルト1秒）
+- 実行ごとに `logs/run-<ISO日時>.log` が生成される
+- **標準出力**にはフェーズ見出し・作成/スキップ結果・完了サマリのみを表示(曲単位のログは出さない)
+- **ログファイル**には標準出力の内容に加え、曲ごとのOK/NG結果も全て記録される
+- 失敗した曲は `failed.json` にも別途まとめて出力される(プレイリスト単位で失敗した曲のリスト)
 
----
+## 注意点
 
-## 6. 今後の拡張アイデア
-
-- [ ] 再生回数順でソートするオプション (`--sort play_count`)
-- [ ] 複数JSONを結合するバッチモード
-- [ ] 既存プレイリストへの追記モード
-- [ ] Claudeとの連携（好みデータから自動でJSON生成）
+- `playlistItems.insert` は書き込みAPIで1回あたり50ユニット消費(10,000ユニット/日の
+  共有プール)。合計200曲を超える追加は1日の上限に達する可能性がある
+- 削除済み・非公開化された動画は追加に失敗する。失敗した曲があった場合は
+  `failed.json` に詳細(videoId・title・artist・失敗理由)が出力される
+- `search.list`(曲名からのvideoId検索)は使用していないため、YouTube検索クオータの
+  制約(2026年6月以降 1日100回)は影響しない

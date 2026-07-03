@@ -1,32 +1,28 @@
-# 認証ファイル（絶対にコミットしない）
-browser.json
-oauth.json
-oauth_clean.json
+# 依存関係
+node_modules/
 
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.egg-info/
+# 認証情報(OAuthのリフレッシュトークン等、絶対にコミットしない)
+token.json
+
+# 実行時に生成される個人の設定・ログ・結果ファイル
+playlists-config.json
+logs/
+failed.json
+
+# プレイリスト作業ディレクトリ(ディレクトリのみ残す)
+playlists/*
+!playlists/.gitkeep
+
+# ビルド成果物
 dist/
-build/
-.eggs/
+*.tsbuildinfo
 
-# 仮想環境
-venv/
-.venv/
-env/
+# 環境変数
+.env
+.env.local
 
-# IDE
+# エディタ・OS
+.DS_Store
 .vscode/
 .idea/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
-
-# playlists
-playlists/**/*.json
-!playlists/sample.json
+.claude/

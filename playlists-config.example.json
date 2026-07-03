@@ -1,0 +1,25 @@
+{
+  "playlists": [
+    {
+      "title": "Chill Night Drive",
+      "description": "夜のドライブ用に選定",
+      "privacyStatus": "private",
+      "tracks": [
+        {
+          "videoId": "dQw4w9WgXcQ",
+          "title": "Never Gonna Give You Up",
+          "artist": "Rick Astley"
+        },
+        {
+          "videoId": "xxxxxxxxxxx"
+        }
+      ]
+    },
+    {
+      "title": "Work Focus",
+      "tracks": [
+        { "videoId": "yyyyyyyyyyy", "title": "曲名3", "artist": "アーティスト3" }
+      ]
+    }
+  ]
+}
